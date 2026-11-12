@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Partitura para a ocarina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF2EE; --surface:#F8FBF8; --ink:#1C2A28; --muted:#5E716C;
+  --line:#A9BBB4; --accent:#2D66AE; --accent-ink:#FFFFFF; --accent-soft:#DCE7F4; --warn:#A5552B; --warn-soft:#F6E4DA; --ok:#2E7A55;
+  --key:#FFFFFF; --key-ink:#3A4744; --key-black:#24312F;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1817; --surface:#172322; --ink:#E3ECE8; --muted:#94A8A2;
+    --line:#3E524D; --accent:#7EB1EC; --accent-ink:#0D1A2A; --accent-soft:#1F3550; --warn:#E59A6E; --warn-soft:#3B2519; --ok:#7CCBA2;
+    --key:#DCE5E1; --key-ink:#2A3533; --key-black:#0A1110;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1817; --surface:#172322; --ink:#E3ECE8; --muted:#94A8A2;
+  --line:#3E524D; --accent:#7EB1EC; --accent-ink:#0D1A2A; --accent-soft:#1F3550; --warn:#E59A6E; --warn-soft:#3B2519; --ok:#7CCBA2;
+  --key:#DCE5E1; --key-ink:#2A3533; --key-black:#0A1110;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:400 17px/1.55 "Alegreya Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:780px;margin:0 auto;padding:28px 20px 64px}
+.top{display:flex;justify-content:flex-end;margin-bottom:14px}
+h1{font:700 clamp(30px,6vw,44px)/1.08 Alegreya,Georgia,serif;margin:0 0 10px;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 26px;max-width:62ch}
+h2{font:700 21px/1.3 Alegreya,Georgia,serif;margin:0 0 10px}
+section{margin-bottom:32px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.hint{color:var(--muted);font-size:15px;margin:8px 0 0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+button{font:500 16px/1 "Alegreya Sans",sans-serif;border-radius:8px;border:1.5px solid var(--line);
+  background:var(--surface);color:var(--ink);padding:9px 14px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700}
+label.check{display:flex;gap:8px;align-items:center;font-size:16px;cursor:pointer}
+label.check input{width:18px;height:18px;accent-color:var(--accent)}
+select{font:500 16px "Alegreya Sans",sans-serif;padding:8px 10px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);max-width:100%}
+.field{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface);flex-wrap:wrap}
+.seg button{border:none;border-radius:0;padding:10px 14px;background:transparent}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.seg.small button{padding:7px 11px;font-size:15px}
+.modes{margin-bottom:18px}
+
+/* Pills */
+.pills{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:56px;padding:10px;
+  border:1.5px solid var(--line);border-radius:10px;background:var(--surface);cursor:text}
+.pills:focus-within{border-color:var(--accent)}
+.pill{display:inline-flex;align-items:center;background:var(--accent-soft);color:var(--ink);border-radius:999px;
+  border:1.5px solid transparent;overflow:hidden}
+.pill.off{background:var(--warn-soft);border-color:var(--warn);border-style:dashed}
+.pill.now{background:var(--accent);color:var(--accent-ink)}
+.pill .pl{border:none;background:transparent;color:inherit;padding:6px 4px 6px 12px;font:700 15px/1 "Alegreya Sans",sans-serif;border-radius:999px 0 0 999px}
+.pill .pl small{font-weight:500;opacity:.75;margin-left:4px}
+.pill .px{border:none;background:transparent;color:inherit;padding:6px 10px 6px 4px;font:500 16px/1 sans-serif;opacity:.6;border-radius:0 999px 999px 0}
+.pill .px:hover{opacity:1}
+#entry{flex:1;min-width:110px;border:none;background:transparent;color:var(--ink);font:500 17px "Alegreya Sans",sans-serif;padding:6px 4px}
+#entry:focus-visible{outline:none}
+
+/* Piano */
+.piano-wrap{overflow-x:auto;padding-bottom:4px}
+.piano{position:relative;display:flex;height:132px;min-width:520px;user-select:none}
+.wk{flex:1;background:var(--key);border:1px solid var(--line);border-radius:0 0 7px 7px;margin-right:-1px;
+  display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding:0 0 8px;
+  color:var(--key-ink);font-size:13px;cursor:pointer}
+.wk.play{background:linear-gradient(to top,color-mix(in srgb,var(--accent) 24%,var(--key)) 0 46%,var(--key) 46%)}
+.wk .b{font-weight:700;font-size:15px;color:#fff;background:#2D66AE;border-radius:50%;
+  width:26px;height:26px;display:grid;place-items:center;margin-bottom:5px}
+.bk{position:absolute;top:0;height:80px;width:6%;background:var(--key-black);
+  border-radius:0 0 5px 5px;border:none;cursor:pointer;padding:0;z-index:2}
+.bk.play{box-shadow:inset 0 -14px 0 #2D66AE}
+.wk:active,.bk:active{filter:brightness(.88)}
+.pad{display:flex;gap:10px;flex-wrap:wrap}
+.pad button{width:58px;height:58px;border-radius:50%;font:700 22px "Alegreya Sans",sans-serif;
+  background:var(--accent);color:var(--accent-ink);border:none;display:grid;place-items:center;padding:0}
+.pad button small{display:block;font-size:11px;font-weight:500;margin-top:-6px}
+
+/* Resultado */
+.staff-wrap{overflow-x:auto;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:8px 4px}
+.staff-wrap svg{display:block}
+.empty{color:var(--muted);padding:28px 16px;text-align:center}
+.seq{font:700 21px/1.45 "Alegreya Sans",sans-serif;letter-spacing:.03em;word-spacing:.25em;margin:14px 0 0;overflow-wrap:anywhere}
+.seq .miss{color:var(--warn)}
+.note-chip circle{fill:var(--accent)}
+.note-chip text{fill:var(--accent-ink);font:700 15px "Alegreya Sans",sans-serif}
+.note-chip text.sm{font-size:11px}
+.note-chip.off circle{fill:none;stroke:var(--warn);stroke-width:1.6;stroke-dasharray:3 3}
+.note-chip.off text{fill:var(--warn)}
+.note-chip.now circle{fill:var(--ink)}
+.note-chip.now text{fill:var(--bg)}
+.note-chip.off.now circle{fill:color-mix(in srgb,var(--warn) 25%,transparent)}
+.note-chip.off.now text{fill:var(--warn)}
+.note-name{fill:var(--muted);font:500 12px "Alegreya Sans",sans-serif}
+.sline{stroke:var(--line);stroke-width:1.3}
+.notice{border-left:4px solid var(--warn);padding:10px 14px;background:var(--surface);border-radius:0 8px 8px 0;margin-top:14px}
+.notice.good{border-left-color:var(--ok)}
+.notice p{margin:0 0 8px}
+.notice p:last-child{margin:0}
+.errors{color:var(--warn);font-size:15px;margin-top:8px}
+.errors.okmsg{color:var(--ok)}
+
+.legend{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;max-width:440px}
+.legend div{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;text-align:center;padding:8px 4px}
+.legend strong{display:block;font-size:22px;color:var(--accent)}
+.legend span{font-size:14px;color:var(--muted)}
+footer{color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:16px}
+footer p{margin:0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <div class="seg small" role="group" aria-label="Idioma / Language">
+      <button data-lang="pt">Português</button><button data-lang="en">English</button>
+    </div>
+  </div>
+
+  <h1 data-t="title"></h1>
+  <p class="lede" data-t="lede"></p>
+
+  <div class="seg modes" role="group">
+    <button data-mode="n2b" data-t="modeN2B"></button>
+    <button data-mode="b2n" data-t="modeB2N"></button>
+    <button data-mode="real" data-t="modeReal"></button>
+  </div>
+
+  <section>
+    <div class="row" style="margin-top:0;margin-bottom:16px">
+      <div class="field" id="layoutField"><label for="layout" data-t="controller"></label><select id="layout"></select></div>
+      <div class="field" id="realField"><label for="realType" data-t="ocType"></label><select id="realType"></select></div>
+    </div>
+    <div class="row" style="margin-top:0;margin-bottom:16px" id="sourceRow">
+      <select id="examples" aria-label="Exemplos"></select>
+      <button id="importBtn" data-t="import"></button>
+      <input type="file" id="file" accept=".musicxml,.xml,.mxl,.mid,.midi" hidden>
+    </div>
+
+    <h2 id="inputTitle"></h2>
+    <div class="pills" id="pills"><input id="entry" autocomplete="off" spellcheck="false"></div>
+    <p class="hint" id="inputHint"></p>
+    <div class="row" id="autoRow">
+      <label class="check"><input type="checkbox" id="auto" checked> <span data-t="auto"></span></label>
+    </div>
+    <div class="errors" id="errors" role="status"></div>
+  </section>
+
+  <section>
+    <h2 data-t="result"></h2>
+    <div class="staff-wrap" id="staff"></div>
+    <p class="seq" id="seq" aria-live="polite"></p>
+    <div class="row">
+      <button class="primary" id="play" data-t="play"></button>
+      <button id="copy" data-t="copy"></button>
+    </div>
+    <div id="notices"></div>
+  </section>
+
+  <section>
+    <div id="pianoBox"><div class="piano-wrap"><div class="piano" id="piano"></div></div></div>
+    <div class="pad" id="pad"></div>
+    <div class="row">
+      <button id="octDown" data-t="octDown"></button>
+      <button id="octUp" data-t="octUp"></button>
+      <button id="undo" data-t="undo"></button>
+      <button id="clear" data-t="clear"></button>
+    </div>
+  </section>
+
+  <section>
+    <h2 id="refTitle"></h2>
+    <div class="legend" id="legend"></div>
+    <p class="hint" id="refHint"></p>
+  </section>
+
+  <footer><p data-t="footer1"></p></footer>
+</main>
+
+<script>
+(function(){
+  const GAME = [62,65,69,71,74];
+  const LAYOUTS = {
+    sw2:{name:{pt:'Switch 2 (remake)',en:'Switch 2 (remake)'}, keys:{62:'L',65:'R',69:'A',71:'Y',74:'X'}},
+    n64:{name:{pt:'Nintendo 64 / Nintendo Classics',en:'Nintendo 64 / Nintendo Classics'}, keys:{62:'A',65:'▼',69:'▶',71:'◀',74:'▲'}},
+    ds3:{name:{pt:'Nintendo 3DS',en:'Nintendo 3DS'}, keys:{62:'L',65:'R',69:'Y',71:'X',74:'A'}}
+  };
+  const REAL = {
+    alto:{name:{pt:'12 furos, contralto em Dó (Lá4 a Fá6)',en:'12-hole alto C (A4 to F6)'}, lo:69, hi:89},
+    soprano:{name:{pt:'12 furos, soprano em Dó (Lá5 a Fá7)',en:'12-hole soprano C (A5 to F7)'}, lo:81, hi:101},
+    bass:{name:{pt:'12 furos, baixo em Dó (Lá3 a Fá5)',en:'12-hole bass C (A3 to F5)'}, lo:57, hi:77}
+  };
+  const SONGS = [
+    {pt:'Brilha, brilha estrelinha', en:'Twinkle, Twinkle, Little Star', n:'C4 C4 G4 G4 A4 A4 G4 F4 F4 E4 E4 D4 D4 C4 G4 G4 F4 F4 E4 E4 D4 G4 G4 F4 F4 E4 E4 D4 C4 C4 G4 G4 A4 A4 G4 F4 F4 E4 E4 D4 D4 C4'},
+    {pt:'Ode à Alegria (Beethoven)', en:'Ode to Joy (Beethoven)', n:'E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 E4 D4 D4 E4 E4 F4 G4 G4 F4 E4 D4 C4 C4 D4 E4 D4 C4 C4'},
+    {pt:'Parabéns a você', en:'Happy Birthday', n:'G4 G4 A4 G4 C5 B4 G4 G4 A4 G4 D5 C5 G4 G4 G5 E5 C5 B4 A4 F5 F5 E5 C5 D5 C5'},
+    {pt:'Frère Jacques', en:'Frère Jacques', n:'C4 D4 E4 C4 C4 D4 E4 C4 E4 F4 G4 E4 F4 G4 G4 A4 G4 F4 E4 C4 G4 A4 G4 F4 E4 C4 C4 G3 C4 C4 G3 C4'},
+    {pt:'Mary tinha um carneirinho', en:'Mary Had a Little Lamb', n:'E4 D4 C4 D4 E4 E4 E4 D4 D4 D4 E4 G4 G4 E4 D4 C4 D4 E4 E4 E4 E4 D4 D4 E4 D4 C4'},
+    {pt:'Jingle Bells (refrão)', en:'Jingle Bells (chorus)', n:'E4 E4 E4 E4 E4 E4 E4 G4 C4 D4 E4 F4 F4 F4 F4 F4 E4 E4 E4 E4 D4 D4 E4 D4 G4 E4 E4 E4 E4 E4 E4 E4 G4 C4 D4 E4 F4 F4 F4 F4 F4 E4 E4 E4 G4 G4 F4 D4 C4'},
+    {pt:'Noite Feliz', en:'Silent Night', n:'G4 A4 G4 E4 G4 A4 G4 E4 D5 D5 B4 C5 C5 G4 A4 A4 C5 B4 A4 G4 A4 G4 E4 A4 A4 C5 B4 A4 G4 A4 G4 E4 D5 D5 F5 D5 B4 C5 E5 C5 G4 E4 G4 F4 D4 C4'},
+    {pt:'Escala do jogo (cabe inteira)', en:'In-game scale (fits fully)', n:'D4 F4 A4 B4 D5 B4 A4 F4 D4'}
+  ];
+  const SHARP = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const NAMES = {
+    pt:['Dó','Dó♯','Ré','Ré♯','Mi','Fá','Fá♯','Sol','Sol♯','Lá','Lá♯','Si'],
+    en:['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B']
+  };
+  const LETTER_IDX = {C:0,D:1,E:2,F:3,G:4,A:5,B:6};
+  const SOLF = {do:0,re:2,mi:4,fa:5,sol:7,la:9,si:11};
+  const LET = {c:0,d:2,e:4,f:5,g:7,a:9,b:11};
+
+  const T = {
+    pt:{
+      title:'Partitura para a ocarina',
+      lede:'Converta melodias para os botões da ocarina do Ocarina of Time, descubra que notas uma sequência de botões toca e confira se uma música cabe numa ocarina de verdade.',
+      modeN2B:'Notas para botões', modeB2N:'Botões para notas', modeReal:'Ocarina de verdade',
+      controller:'Controle', ocType:'Tipo de ocarina', notes:'Notas', buttons:'Botões',
+      examples:'Carregar exemplo…', import:'Importar partitura',
+      hintNotes:'Digite uma nota (Ré4, Fá, C#5…) e aperte espaço ou Enter. Dá para colar várias de uma vez. Toque numa nota para ouvir; × remove.',
+      hintBtnSw:'Digite ou cole os botões, com ou sem separadores (por exemplo “L R A Y X” ou “L – R – A”).',
+      hintBtnN64:'Use A e as setas dos botões C: ▲ ▼ ◀ ▶, ↑ ↓ ← → ou ^ v < >.',
+      phNotes:'Digite uma nota…', phBtns:'Digite um botão…',
+      undo:'Apagar última', clear:'Limpar tudo',
+      auto:'Ajustar a oitava automaticamente',
+      octDown:'Oitava abaixo', octUp:'Oitava acima',
+      result:'Resultado', play:'Tocar', stop:'Parar', copy:'Copiar', copied:'Copiado', copyFail:'Não foi possível copiar',
+      emptyNotes:'Adicione notas, carregue um exemplo ou importe uma partitura para ver o resultado aqui.',
+      emptyBtns:'Adicione alguns botões para ver as notas aqui.',
+      notUnderstood:'Não entendi: ', remove:'Remover',
+      missing:(n,t)=>`${n} de ${t} notas não existem na ocarina do jogo e aparecem com “?”.`,
+      bestShift:(d,b,t)=>`Transpondo a melodia (${d}), ${b} de ${t} notas passam a caber.`,
+      applyShift:d=>`Transpor ${d}`,
+      noShift:'Nenhuma transposição melhora o resultado. Para tocar no jogo, a melodia precisa ser simplificada.',
+      shifted:d=>`Melodia transposta ${d}.`, resetShift:'Voltar ao tom original',
+      up:t=>`subindo ${t} semitom${t>1?'s':''}`, down:t=>`descendo ${t} semitom${t>1?'s':''}`,
+      scareOk:'Esta sequência serve como Canção do Espantalho: tem 8 notas do jogo e pelo menos 2 notas diferentes.',
+      scareInfo:n=>`Canção do Espantalho: são 8 notas com pelo menos 2 diferentes. Esta sequência tem ${n}.`,
+      scareSame:'Canção do Espantalho: as 8 notas não podem ser todas iguais.',
+      outRange:(n,t,lo,hi)=>`${n} de ${t} notas ficam fora da extensão desta ocarina (${lo} a ${hi}).`,
+      bestOct:(d,b,t)=>`Mudando ${d}, ${b} de ${t} notas cabem.`,
+      octWord:k=>`${Math.abs(k)} oitava${Math.abs(k)>1?'s':''} ${k>0?'acima':'abaixo'}`,
+      applyOct:d=>`Mudar ${d}`, noOct:'Mudar de oitava não resolve: a melodia é mais extensa que o instrumento.',
+      allFit:'Todas as notas cabem nesta ocarina. Como a de 12 furos é cromática, sustenidos e bemóis também funcionam.',
+      octShifted:d=>`Melodia movida ${d}.`,
+      refGame:'Notas disponíveis no jogo', refReal:'Sobre a ocarina de verdade',
+      refHintGame:'Notas fora dessas cinco aparecem tracejadas. Se você ativou os controles alternativos da ocarina no remake, os botões mudam.',
+      refHintReal:'A ocarina de 12 furos toca todas as notas dentro da extensão, inclusive sustenidos e bemóis, por isso aqui só importa a extensão. Contralto em Dó é o modelo mais comum, inclusive nas réplicas da ocarina do jogo.',
+      footer1:'Ferramenta não oficial, feita por fã. Notas do jogo: Ré4, Fá4, Lá4, Si4 e Ré5.',
+      importHint:'Aceita MusicXML (.musicxml, .xml, .mxl) e MIDI (.mid). PDF e foto não funcionam: no MuseScore, exporte como MusicXML.',
+      importDone:(n,f)=>`${n} notas importadas de “${f}”.`,
+      importCut:(n,f)=>`Importadas as primeiras ${n} notas de “${f}”.`,
+      importNone:'Não encontrei notas de melodia nesse arquivo.',
+      importFail:'Não consegui ler esse arquivo. Use MusicXML (.musicxml, .xml, .mxl) ou MIDI (.mid).'
+    },
+    en:{
+      title:'Sheet music to ocarina',
+      lede:'Turn melodies into ocarina buttons for Ocarina of Time, see which notes a button sequence plays, and check whether a tune fits a real ocarina.',
+      modeN2B:'Notes to buttons', modeB2N:'Buttons to notes', modeReal:'Real ocarina',
+      controller:'Controller', ocType:'Ocarina type', notes:'Notes', buttons:'Buttons',
+      examples:'Load an example…', import:'Import sheet music',
+      hintNotes:'Type a note (D4, F, Re5…) and press space or Enter. You can paste several at once. Tap a note to hear it; × removes it.',
+      hintBtnSw:'Type or paste the buttons, with or without separators (for example “L R A Y X” or “L – R – A”).',
+      hintBtnN64:'Use A and the C-button arrows: ▲ ▼ ◀ ▶, ↑ ↓ ← → or ^ v < >.',
+      phNotes:'Type a note…', phBtns:'Type a button…',
+      undo:'Delete last', clear:'Clear all',
+      auto:'Adjust octave automatically',
+      octDown:'Octave down', octUp:'Octave up',
+      result:'Result', play:'Play', stop:'Stop', copy:'Copy', copied:'Copied', copyFail:'Couldn’t copy',
+      emptyNotes:'Add notes, load an example or import sheet music to see the result here.',
+      emptyBtns:'Add a few buttons to see the notes here.',
+      notUnderstood:'Didn’t understand: ', remove:'Remove',
+      missing:(n,t)=>`${n} of ${t} notes don’t exist on the in-game ocarina and show as “?”.`,
+      bestShift:(d,b,t)=>`Transposing the melody (${d}), ${b} of ${t} notes fit.`,
+      applyShift:d=>`Transpose ${d}`,
+      noShift:'No transposition improves the result. To play it in the game, the melody needs to be simplified.',
+      shifted:d=>`Melody transposed ${d}.`, resetShift:'Back to original key',
+      up:t=>`up ${t} semitone${t>1?'s':''}`, down:t=>`down ${t} semitone${t>1?'s':''}`,
+      scareOk:'This sequence works as the Scarecrow’s Song: 8 in-game notes with at least 2 different notes.',
+      scareInfo:n=>`Scarecrow’s Song: it takes 8 notes with at least 2 different ones. This sequence has ${n}.`,
+      scareSame:'Scarecrow’s Song: the 8 notes can’t all be the same.',
+      outRange:(n,t,lo,hi)=>`${n} of ${t} notes fall outside this ocarina’s range (${lo} to ${hi}).`,
+      bestOct:(d,b,t)=>`Moving ${d}, ${b} of ${t} notes fit.`,
+      octWord:k=>`${Math.abs(k)} octave${Math.abs(k)>1?'s':''} ${k>0?'up':'down'}`,
+      applyOct:d=>`Move ${d}`, noOct:'Changing octave doesn’t help: the melody spans more than the instrument.',
+      allFit:'Every note fits this ocarina. A 12-hole ocarina is chromatic, so sharps and flats work too.',
+      octShifted:d=>`Melody moved ${d}.`,
+      refGame:'Notes available in the game', refReal:'About the real ocarina',
+      refHintGame:'Notes outside these five show with a dashed outline. If you turned on the alternative ocarina controls in the remake, the buttons change.',
+      refHintReal:'A 12-hole ocarina plays every note within its range, sharps and flats included, so only the range matters here. Alto C is the most common model, including replicas of the in-game ocarina.',
+      footer1:'Unofficial fan-made tool. In-game notes: D4, F4, A4, B4 and D5.',
+      importHint:'Accepts MusicXML (.musicxml, .xml, .mxl) and MIDI (.mid). PDFs and photos won’t work: in MuseScore, export as MusicXML.',
+      importDone:(n,f)=>`Imported ${n} notes from “${f}”.`,
+      importCut:(n,f)=>`Imported the first ${n} notes from “${f}”.`,
+      importNone:'Couldn’t find melody notes in that file.',
+      importFail:'Couldn’t read that file. Use MusicXML (.musicxml, .xml, .mxl) or MIDI (.mid).'
+    }
+  };
+
+  const $ = id => document.getElementById(id);
+  const entry = $('entry');
+  const defLang = () => (navigator.language||'pt').toLowerCase().startsWith('pt') ? 'pt' : 'en';
+  const st = {lang:defLang(), mode:'n2b', layout:'sw2', real:'alto', auto:true, shift:0, octShift:0, pianoBase:60,
+              seqs:{n2b:[], b2n:[], real:[]}};
+  try{
+    const saved = JSON.parse(localStorage.getItem('ocarina-state-v2') || 'null');
+    if(saved) Object.assign(st, saved, {seqs:Object.assign(st.seqs, saved.seqs||{})});
+  }catch(e){}
+  if(!LAYOUTS[st.layout]) st.layout = 'sw2';
+  if(!REAL[st.real]) st.real = 'alto';
+  const save = () => { try{ localStorage.setItem('ocarina-state-v2', JSON.stringify(st)); }catch(e){} };
+  const t = k => T[st.lang][k];
+  const seq = () => st.seqs[st.mode];
+
+  const pcOf = m => ((m%12)+12)%12;
+  const octOf = m => Math.floor(m/12)-1;
+  const nameOf = m => NAMES[st.lang][pcOf(m)] + octOf(m);
+  const shortOf = m => NAMES[st.lang][pcOf(m)];
+  const stepOf = m => LETTER_IDX[SHARP[pcOf(m)][0]] + 7*octOf(m);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  // ---------- Leitura de texto ----------
+  function parseNotes(text, ref){
+    ref = ref || 65;
+    const toks = text.split(/[\s,;|\-–—]+/).filter(Boolean);
+    const notes = [], errors = [];
+    for(const tok of toks){
+      const s = tok.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+      const m = s.match(/^(do|re|mi|fa|sol|la|si|[cdefgab])(#|♯|b|♭)?(\d)?$/);
+      if(!m){ errors.push(tok); continue; }
+      let pc = m[1].length > 1 ? SOLF[m[1]] : LET[m[1]];
+      if(m[2]==='#'||m[2]==='♯') pc++;
+      if(m[2]==='b'||m[2]==='♭') pc--;
+      let midi;
+      if(m[3] !== undefined) midi = 12*(parseInt(m[3],10)+1) + pc;
+      else{
+        const base = 60 + pc, c = [base-12, base, base+12];
+        midi = c.reduce((a,b)=>{ const da=Math.abs(a-ref), db=Math.abs(b-ref); return db<da || (db===da && b>a) ? b : a; });
+      }
+      notes.push(midi); ref = midi;
+    }
+    return {notes, errors};
+  }
+  function parseButtons(text){
+    const keys = LAYOUTS[st.layout].keys, inv = {};
+    for(const m in keys) inv[keys[m]] = +m;
+    const notes = [], errors = [];
+    for(const ch of text){
+      if(/[\s,;|\-–—.\/\uFE0F]/.test(ch)) continue;
+      let k = null;
+      if(st.layout === 'n64'){
+        const c = ch.toLowerCase();
+        if(c==='a') k='A';
+        else if('↓▼v⬇'.includes(c)) k='▼';
+        else if('↑▲^⬆'.includes(c)) k='▲';
+        else if('←◀<⬅'.includes(c)) k='◀';
+        else if('→▶>➡'.includes(c)) k='▶';
+        else if(c==='c') continue;
+      } else { const u = ch.toUpperCase(); if('LRAXY'.includes(u)) k = u; }
+      if(k) notes.push(inv[k]); else errors.push(ch);
+    }
+    return {notes, errors};
+  }
+  function mapGame(m){
+    const keys = LAYOUTS[st.layout].keys;
+    if(keys[m]) return {btn:keys[m], target:m};
+    if(!st.auto) return null;
+    const pc = pcOf(m);
+    const tgt = pc===2 ? (m<=68?62:74) : pc===5 ? 65 : pc===9 ? 69 : pc===11 ? 71 : null;
+    return tgt ? {btn:keys[tgt], target:tgt} : null;
+  }
+  const fitsGame = (notes,s) => notes.filter(m=>[2,5,9,11].includes(pcOf(m+s))).length;
+
+  // ---------- Importação ----------
+  function parseMusicXML(text){
+    const doc = new DOMParser().parseFromString(text, 'application/xml');
+    if(doc.getElementsByTagName('parsererror').length) throw new Error('xml');
+    const part = doc.getElementsByTagName('part')[0];
+    if(!part) throw new Error('nopart');
+    const out = [];
+    for(const n of part.getElementsByTagName('note')){
+      if(n.getElementsByTagName('rest').length || n.getElementsByTagName('grace').length) continue;
+      const v = n.getElementsByTagName('voice')[0];
+      if(v && v.textContent.trim() !== '1') continue;
+      const ties = [...n.getElementsByTagName('tie')].map(x=>x.getAttribute('type'));
+      const p = n.getElementsByTagName('pitch')[0]; if(!p) continue;
+      const step = p.getElementsByTagName('step')[0].textContent.trim().toLowerCase();
+      const alter = p.getElementsByTagName('alter')[0];
+      const oct = parseInt(p.getElementsByTagName('octave')[0].textContent, 10);
+      const midi = 12*(oct+1) + LET[step] + (alter ? Math.round(parseFloat(alter.textContent)) : 0);
+      if(n.getElementsByTagName('chord').length){ if(out.length && midi > out[out.length-1]) out[out.length-1] = midi; continue; }
+      if(ties.includes('stop')) continue;
+      out.push(midi);
+    }
+    return out;
+  }
+  function parseMidi(buf){
+    const d = new DataView(buf); let p = 0;
+    const str = n => { let s=''; for(let i=0;i<n;i++) s += String.fromCharCode(d.getUint8(p+i)); return s; };
+    const vlq = () => { let v=0, b; do{ b = d.getUint8(p++); v = (v<<7)|(b&0x7f); }while(b&0x80); return v; };
+    if(str(4) !== 'MThd') throw new Error('midi');
+    const hlen = d.getUint32(4); const ntr = d.getUint16(10); p = 8 + hlen;
+    const tracks = [];
+    for(let tr=0; tr<ntr && p < d.byteLength; tr++){
+      if(str(4) !== 'MTrk'){ break; }
+      const len = d.getUint32(p+4); p += 8; const end = p + len;
+      let tick = 0, run = 0; const notes = [];
+      while(p < end){
+        tick += vlq();
+        let status = d.getUint8(p);
+        if(status & 0x80){ p++; } else status = run;
+        if(status === 0xFF){ p++; const l = vlq(); p += l; continue; }
+        if(status === 0xF0 || status === 0xF7){ const l = vlq(); p += l; continue; }
+        run = status;
+        const type = status & 0xF0, ch = status & 0x0F;
+        if(type === 0xC0 || type === 0xD0){ p += 1; continue; }
+        const a = d.getUint8(p), b = d.getUint8(p+1); p += 2;
+        if(type === 0x90 && b > 0 && ch !== 9) notes.push({tick, note:a});
+      }
+      p = end; tracks.push(notes);
+    }
+    const best = tracks.reduce((a,b)=> b.length > a.length ? b : a, []);
+    const byTick = new Map();
+    best.forEach(e => byTick.set(e.tick, Math.max(byTick.get(e.tick) ?? -1, e.note)));
+    return [...byTick.entries()].sort((a,b)=>a[0]-b[0]).map(e=>e[1]);
+  }
+  function loadJSZip(){
+    if(window.JSZip) return Promise.resolve(window.JSZip);
+    return new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+      s.onload = () => res(window.JSZip); s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  async function importFile(file){
+    const msg = $('errors'); msg.className = 'errors';
+    try{
+      const name = file.name.toLowerCase();
+      let notes;
+      if(name.endsWith('.mid') || name.endsWith('.midi')) notes = parseMidi(await file.arrayBuffer());
+      else if(name.endsWith('.mxl')){
+        const JSZip = await loadJSZip();
+        const zip = await JSZip.loadAsync(await file.arrayBuffer());
+        let path = null;
+        const cont = zip.file('META-INF/container.xml');
+        if(cont){ const m = (await cont.async('string')).match(/full-path="([^"]+)"/); if(m) path = m[1]; }
+        if(!path) path = Object.keys(zip.files).find(k => /\.(musicxml|xml)$/i.test(k) && !k.startsWith('META-INF'));
+        notes = parseMusicXML(await zip.file(path).async('string'));
+      } else notes = parseMusicXML(await file.text());
+      if(!notes.length){ msg.textContent = t('importNone'); return; }
+      const MAX = 400, cut = notes.length > MAX;
+      st.seqs[st.mode] = notes.slice(0, MAX); st.shift = 0; st.octShift = 0;
+      render();
+      msg.className = 'errors okmsg';
+      msg.textContent = cut ? t('importCut')(MAX, file.name) : t('importDone')(notes.length, file.name);
+    }catch(e){ msg.textContent = t('importFail'); }
+  }
+
+  // ---------- Pauta ----------
+  function drawStaff(items){
+    const gap = 46, left = 24, half = 7, e4 = 30;
+    const y = s => 106 - (s - e4)*half;
+    const ys = items.map(it => y(stepOf(it.midi)));
+    const minY = Math.min(36, ...ys) - 18, maxY = Math.max(106, ...ys) + 40;
+    const w = left*2 + items.length*gap;
+    let s = `<svg width="${w}" height="${maxY-minY}" viewBox="0 ${minY} ${w} ${maxY-minY}" role="img">`;
+    for(let i=0;i<5;i++){ const yy = 50+i*14; s += `<line class="sline" x1="8" x2="${w-8}" y1="${yy}" y2="${yy}"/>`; }
+    items.forEach((it,i)=>{
+      const x = left + gap/2 + i*gap, stp = stepOf(it.midi);
+      for(let k=e4-2;k>=stp;k-=2) s += `<line class="sline" x1="${x-17}" x2="${x+17}" y1="${y(k)}" y2="${y(k)}"/>`;
+      for(let k=e4+10;k<=stp;k+=2) s += `<line class="sline" x1="${x-17}" x2="${x+17}" y1="${y(k)}" y2="${y(k)}"/>`;
+      const yy = y(stp), sm = [...it.label].length > 2 ? ' class="sm"' : '';
+      s += `<g class="note-chip${it.off?' off':''}" data-i="${i}"><circle cx="${x}" cy="${yy}" r="14"/>`+
+           `<text${sm} x="${x}" y="${yy+5}" text-anchor="middle">${it.label}</text></g>`;
+      s += `<text class="note-name" x="${x}" y="${maxY-12}" text-anchor="middle">${nameOf(it.midi)}</text>`;
+    });
+    return s + '</svg>';
+  }
+
+  // ---------- Render ----------
+  let items = [];
+  function computeItems(){
+    const notes = seq();
+    if(st.mode === 'n2b') return notes.map(n => { const m = n + st.shift, mp = mapGame(m);
+      return mp ? {midi:mp.target, label:mp.btn, off:false, out:mp.btn} : {midi:m, label:'?', off:true, out:'?'}; });
+    if(st.mode === 'b2n') return notes.map(m => ({midi:m, label:LAYOUTS[st.layout].keys[m] || '?', off:false, out:nameOf(m)}));
+    const R = REAL[st.real];
+    return notes.map(n => { const m = n + st.octShift, ok = m>=R.lo && m<=R.hi; return {midi:m, label:shortOf(m), off:!ok, out:nameOf(m)}; });
+  }
+
+  function renderPills(){
+    const box = $('pills');
+    box.querySelectorAll('.pill').forEach(p => p.remove());
+    const frag = document.createDocumentFragment();
+    seq().forEach((m,i)=>{
+      const it = items[i];
+      const span = document.createElement('span');
+      span.className = 'pill' + (it.off ? ' off' : '');
+      span.dataset.i = i;
+      const label = st.mode === 'b2n' ? `${esc(it.label)}<small>${esc(nameOf(m))}</small>` : esc(nameOf(m));
+      span.innerHTML = `<button class="pl" type="button">${label}</button><button class="px" type="button" aria-label="${t('remove')} ${esc(nameOf(m))}">×</button>`;
+      span.querySelector('.pl').onclick = e => { e.stopPropagation(); tone(it.midi, now()+.01, .38, it.off); };
+      span.querySelector('.px').onclick = e => { e.stopPropagation(); seq().splice(i,1); render(); };
+      frag.appendChild(span);
+    });
+    box.insertBefore(frag, entry);
+  }
+
+  function render(){
+    save();
+    items = computeItems();
+    renderPills();
+    const notices = $('notices'); notices.innerHTML = '';
+    const game = st.mode !== 'real';
+
+    if(!items.length){
+      $('staff').innerHTML = `<div class="empty">${st.mode==='b2n'?t('emptyBtns'):t('emptyNotes')}</div>`;
+      $('seq').textContent = '';
+    } else {
+      $('staff').innerHTML = drawStaff(items);
+      $('seq').innerHTML = items.map(it => it.off && st.mode==='n2b'
+        ? `<span class="miss" title="${esc(nameOf(it.midi))}">?</span>`
+        : it.off ? `<span class="miss">${esc(it.out)}</span>` : esc(it.out)).join(' ');
+    }
+
+    let html = '';
+    const notes = seq();
+    if(st.mode === 'n2b' && notes.length){
+      const total = notes.length, cur = fitsGame(notes, st.shift);
+      const desc = s => s>0 ? t('up')(s) : t('down')(-s);
+      if(cur < total){
+        let best = st.shift, bestN = cur;
+        for(let s=-6;s<=5;s++){ const n = fitsGame(notes,s); if(n>bestN || (n===bestN && n>cur && Math.abs(s)<Math.abs(best))){ best=s; bestN=n; } }
+        html += `<div class="notice"><p>${t('missing')(total-cur,total)}</p>`;
+        html += bestN>cur ? `<p>${t('bestShift')(desc(best),bestN,total)}</p><p><button data-shift="${best}">${t('applyShift')(desc(best))}</button></p>` : `<p>${t('noShift')}</p>`;
+        html += '</div>';
+      }
+      if(st.shift) html += `<div class="row"><span>${t('shifted')(desc(st.shift))}</span><button data-shift="0">${t('resetShift')}</button></div>`;
+    }
+    if(game && items.length && items.every(it=>!it.off)){
+      const distinct = new Set(items.map(it=>it.midi)).size;
+      if(items.length === 8 && distinct >= 2) html += `<div class="notice good"><p>${t('scareOk')}</p></div>`;
+      else if(items.length === 8) html += `<div class="notice"><p>${t('scareSame')}</p></div>`;
+      else if(items.length >= 5 && items.length <= 10) html += `<p class="hint">${t('scareInfo')(items.length)}</p>`;
+    }
+    if(st.mode === 'real' && notes.length){
+      const R = REAL[st.real], total = notes.length;
+      const inR = k => notes.filter(n => n+k>=R.lo && n+k<=R.hi).length;
+      const cur = inR(st.octShift);
+      if(cur < total){
+        let best = st.octShift, bestN = cur;
+        for(const k of [-36,-24,-12,0,12,24,36]){ const n = inR(k); if(n>bestN){ best=k; bestN=n; } }
+        html += `<div class="notice"><p>${t('outRange')(total-cur,total,nameOf(R.lo),nameOf(R.hi))}</p>`;
+        if(bestN > cur){ const d = t('octWord')(best/12);
+          html += `<p>${t('bestOct')(d,bestN,total)}</p><p><button data-oct="${best}">${t('applyOct')(d)}</button></p>`; }
+        else html += `<p>${t('noOct')}</p>`;
+        html += '</div>';
+      } else html += `<div class="notice good"><p>${t('allFit')}</p></div>`;
+      if(st.octShift) html += `<div class="row"><span>${t('octShifted')(t('octWord')(st.octShift/12))}</span><button data-oct="0">${t('resetShift')}</button></div>`;
+    }
+    notices.innerHTML = html;
+    notices.querySelectorAll('[data-shift]').forEach(b => b.onclick = () => { st.shift = +b.dataset.shift; render(); });
+    notices.querySelectorAll('[data-oct]').forEach(b => b.onclick = () => { st.octShift = +b.dataset.oct; render(); });
+  }
+
+  // ---------- Entrada por pills ----------
+  function commit(text){
+    if(!text.trim()) return;
+    const msg = $('errors'); msg.className = 'errors';
+    const notes = seq();
+    const r = st.mode === 'b2n' ? parseButtons(text) : parseNotes(text, notes.length ? notes[notes.length-1] : 65);
+    notes.push(...r.notes);
+    msg.textContent = r.errors.length ? t('notUnderstood') + r.errors.join(' ') : '';
+    if(r.notes.length === 1) tone(r.notes[0] + (st.mode==='n2b'?st.shift:st.mode==='real'?st.octShift:0), now()+.01, .3);
+    render();
+  }
+  entry.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' ' || e.key === ','){ e.preventDefault(); commit(entry.value); entry.value=''; }
+    else if(e.key === 'Backspace' && !entry.value && seq().length){ seq().pop(); render(); }
+  });
+  entry.addEventListener('input', () => {
+    const v = entry.value;
+    if(st.mode === 'b2n'){ if(v.length){ commit(v); entry.value=''; } return; }
+    if(/[\s,;|]/.test(v)){
+      const parts = v.split(/([\s,;|]+)/);
+      const last = /[\s,;|]$/.test(v) ? '' : parts.pop();
+      commit(parts.join(' ')); entry.value = last;
+    }
+  });
+  entry.addEventListener('blur', () => { if(entry.value.trim()){ commit(entry.value); entry.value=''; } });
+  $('pills').addEventListener('click', () => entry.focus());
+
+  // ---------- Controles ----------
+  function buildControls(){
+    const L = LAYOUTS[st.layout].keys, R = REAL[st.real];
+    const playable = m => st.mode==='real' ? (m>=R.lo && m<=R.hi) : GAME.includes(m);
+    const piano = $('piano'); piano.innerHTML = '';
+    [0,2,4,5,7,9,11,12,14,16].forEach(o=>{
+      const m = st.pianoBase + o, b = document.createElement('button');
+      b.className = 'wk' + (playable(m)?' play':'');
+      b.innerHTML = (st.mode!=='real' && L[m] ? `<span class="b">${L[m]}</span>` : '') + nameOf(m);
+      b.setAttribute('aria-label', nameOf(m));
+      b.onclick = () => addNote(m);
+      piano.appendChild(b);
+    });
+    [[1,0],[3,1],[6,3],[8,4],[10,5],[13,7],[15,8]].forEach(([o,after])=>{
+      const m = st.pianoBase + o, b = document.createElement('button');
+      b.className = 'bk' + (st.mode==='real' && playable(m) ? ' play' : '');
+      b.style.left = `calc(${(after+1)*10}% - 3%)`;
+      b.setAttribute('aria-label', nameOf(m));
+      b.onclick = () => addNote(m);
+      piano.appendChild(b);
+    });
+    const pad = $('pad'); pad.innerHTML = '';
+    GAME.forEach(m=>{
+      const b = document.createElement('button');
+      b.innerHTML = `${L[m]}<small>${shortOf(m)}</small>`;
+      b.setAttribute('aria-label', `${L[m]}, ${nameOf(m)}`);
+      b.onclick = () => addNote(m);
+      pad.appendChild(b);
+    });
+    $('legend').innerHTML = st.mode === 'real'
+      ? `<div style="grid-column:1/-1"><strong>${nameOf(R.lo)} – ${nameOf(R.hi)}</strong><span>${R.name[st.lang]}</span></div>`
+      : GAME.map(m=>`<div><strong>${L[m]}</strong><span>${nameOf(m)}</span></div>`).join('');
+  }
+  function addNote(m){
+    const off = st.mode==='real' ? !(m>=REAL[st.real].lo && m<=REAL[st.real].hi) : !GAME.includes(m);
+    tone(m, now()+.01, .38, off);
+    seq().push(m);
+    render();
+  }
+
+  function applyLang(){
+    document.documentElement.lang = st.lang === 'pt' ? 'pt-BR' : 'en';
+    document.title = t('title');
+    document.querySelectorAll('[data-t]').forEach(el => el.textContent = t(el.dataset.t));
+    document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang===st.lang));
+    document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode===st.mode));
+    $('layout').innerHTML = Object.entries(LAYOUTS).map(([k,v])=>`<option value="${k}"${k===st.layout?' selected':''}>${v.name[st.lang]}</option>`).join('');
+    $('realType').innerHTML = Object.entries(REAL).map(([k,v])=>`<option value="${k}"${k===st.real?' selected':''}>${v.name[st.lang]}</option>`).join('');
+    $('examples').innerHTML = `<option value="">${t('examples')}</option>` + SONGS.map((s,i)=>`<option value="${i}">${s[st.lang]}</option>`).join('');
+    const game = st.mode !== 'real', b2n = st.mode === 'b2n';
+    $('layoutField').hidden = !game;
+    $('realField').hidden = game;
+    $('sourceRow').hidden = b2n;
+    $('pianoBox').hidden = b2n;
+    $('pad').hidden = !b2n;
+    $('octDown').hidden = $('octUp').hidden = b2n;
+    $('autoRow').hidden = st.mode !== 'n2b';
+    $('inputTitle').textContent = b2n ? t('buttons') : t('notes');
+    $('inputHint').textContent = b2n ? (st.layout==='n64' ? t('hintBtnN64') : t('hintBtnSw')) : t('hintNotes') + ' ' + t('importHint');
+    entry.placeholder = b2n ? t('phBtns') : t('phNotes');
+    $('refTitle').textContent = game ? t('refGame') : t('refReal');
+    $('refHint').textContent = game ? t('refHintGame') : t('refHintReal');
+    $('errors').textContent = '';
+    buildControls();
+    render();
+  }
+
+  // ---------- Som ----------
+  let ctx = null;
+  function audio(){ if(!ctx){ const AC = window.AudioContext||window.webkitAudioContext; if(AC) ctx = new AC(); } if(ctx && ctx.state==='suspended') ctx.resume(); return ctx; }
+  const now = () => { const c = audio(); return c ? c.currentTime : 0; };
+  const voices = [];
+  function tone(m, when, dur, quiet){
+    const c = audio(); if(!c) return;
+    const f = 440*Math.pow(2,(m-69)/12);
+    const o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), g2 = c.createGain(), lfo = c.createOscillator(), lg = c.createGain();
+    o.type='sine'; o.frequency.value=f; o2.type='triangle'; o2.frequency.value=f; g2.gain.value=.18;
+    lfo.frequency.value=5.2; lg.gain.value=f*.006; lfo.connect(lg); lg.connect(o.frequency);
+    o2.connect(g2); g2.connect(g); o.connect(g); g.connect(c.destination);
+    const peak = quiet ? .07 : .22;
+    g.gain.setValueAtTime(0,when); g.gain.linearRampToValueAtTime(peak,when+.04);
+    g.gain.setValueAtTime(peak,when+dur-.08); g.gain.linearRampToValueAtTime(0,when+dur);
+    [o,o2,lfo].forEach(x=>{ x.start(when); x.stop(when+dur+.02); });
+    voices.push(g);
+  }
+  let timers = [], playing = false;
+  const clearNow = () => document.querySelectorAll('.note-chip.now,.pill.now').forEach(e=>e.classList.remove('now'));
+  function stop(){
+    timers.forEach(clearTimeout); timers = []; clearNow();
+    const c = audio(); if(c) voices.splice(0).forEach(g => { try{ g.gain.cancelScheduledValues(c.currentTime); g.gain.setValueAtTime(0,c.currentTime); }catch(e){} });
+    playing = false; $('play').textContent = t('play');
+  }
+  $('play').onclick = () => {
+    if(playing){ stop(); return; }
+    if(!audio() || !items.length) return;
+    stop(); playing = true; $('play').textContent = t('stop');
+    const step = .42, t0 = now() + .05;
+    items.forEach((it,i)=>{
+      tone(it.midi, t0+i*step, step*.92, it.off);
+      timers.push(setTimeout(()=>{ clearNow();
+        const el = document.querySelector(`.note-chip[data-i="${i}"]`); if(el) el.classList.add('now');
+        const pl = document.querySelector(`.pill[data-i="${i}"]`); if(pl) pl.classList.add('now');
+      }, (i*step+.05)*1000));
+    });
+    timers.push(setTimeout(stop, (items.length*step+.1)*1000));
+  };
+
+  $('copy').onclick = async () => {
+    const txt = items.map(it=>it.out).join(' '); if(!txt) return;
+    const b = $('copy');
+    try{ await navigator.clipboard.writeText(txt); b.textContent = t('copied'); }
+    catch(e){ const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); b.textContent = t('copied'); }catch(_){ b.textContent = t('copyFail'); } ta.remove(); }
+    setTimeout(()=> b.textContent = t('copy'), 1600);
+  };
+
+  $('examples').onchange = e => {
+    const i = e.target.value; if(i === '') return;
+    st.seqs[st.mode] = parseNotes(SONGS[i].n).notes; st.shift = 0; st.octShift = 0;
+    $('errors').textContent = '';
+    e.target.value = ''; render();
+  };
+  $('importBtn').onclick = () => $('file').click();
+  $('file').onchange = e => { const f = e.target.files[0]; if(f) importFile(f); e.target.value = ''; };
+  $('undo').onclick = () => { seq().pop(); render(); };
+  $('clear').onclick = () => { st.seqs[st.mode] = []; st.shift = 0; st.octShift = 0; $('errors').textContent=''; render(); entry.focus(); };
+  $('octDown').onclick = () => { st.pianoBase = Math.max(36, st.pianoBase-12); buildControls(); save(); };
+  $('octUp').onclick = () => { st.pianoBase = Math.min(96, st.pianoBase+12); buildControls(); save(); };
+  $('auto').onchange = e => { st.auto = e.target.checked; render(); };
+  $('layout').onchange = e => { st.layout = e.target.value; applyLang(); };
+  $('realType').onchange = e => { st.real = e.target.value; st.octShift = 0; applyLang(); };
+  document.querySelectorAll('[data-lang]').forEach(b => b.onclick = () => { st.lang = b.dataset.lang; applyLang(); });
+  document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => {
+    stop(); st.mode = b.dataset.mode; entry.value = '';
+    if(st.mode === 'real' && st.pianoBase < 60) st.pianoBase = 60;
+    applyLang();
+  });
+
+  if(!st.seqs.n2b.length && !st.seqs.b2n.length && !st.seqs.real.length){
+    st.seqs.n2b = parseNotes(SONGS[0].n).notes;
+  }
+  $('auto').checked = st.auto;
+  applyLang();
+})();
+</script>
+</body>
+</html>
